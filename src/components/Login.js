@@ -1,31 +1,27 @@
-import React, { useRef, useState } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
-import { auth, signInWithEmailAndPassword } from "../firebase"; // import Firebase auth methods
+import React, { useState } from "react"
+import { Form, Button, Card, Alert } from "react-bootstrap"
+import { useAuth } from "../contexts/AuthContext"
+import { Link, useHistory } from "react-router-dom"
 
 export default function Login() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const { login } = useAuth()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const history = useHistory()
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
-
-    setLoading(true);
-    setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
     try {
-      // Firebase Authentication to check email and password
-      await signInWithEmailAndPassword(auth, email, password);
-      history.push("/dashboard"); // Redirect after successful login
-    } catch (error) {
-      setError("Failed to log in: " + error.message);
+      await login(email, password)
+      history.push("/") // Redirect to home or another page after successful login
+    } catch {
+      setError("Failed to log in")
     }
-    setLoading(false);
+
+    setLoading(false)
   }
 
   return (
@@ -37,11 +33,21 @@ export default function Login() {
           <Form onSubmit={handleSubmit}>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required />
+              <Form.Control
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" ref={passwordRef} required />
+              <Form.Control
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </Form.Group>
             <Button disabled={loading} className="w-100" type="submit">
               Log In
@@ -56,5 +62,5 @@ export default function Login() {
         Need an account? <Link to="/signup">Sign Up</Link>
       </div>
     </>
-  );
+  )
 }
