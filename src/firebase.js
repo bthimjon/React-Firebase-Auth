@@ -1,9 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth"
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 
-const app = initializeApp({
+initializeApp({
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
@@ -13,7 +12,17 @@ const app = initializeApp({
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 })
 
-const auth = getAuth(app)
-const db = getFirestore(app)
+const auth = getAuth()
 
-export { auth, db}
+const signup = async (email, password) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential;
+  } catch (error) {
+    console.error("Error signing up:", error);
+    console.log(error)
+    throw error; 
+  }
+};
+
+export { auth, signup };
